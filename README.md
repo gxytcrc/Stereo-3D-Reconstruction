@@ -1,5 +1,6 @@
 # Stereo 3D reconstruction
-This project is using stereo camera to recontrust the 3D enviroment. The project didn't add parallel threads yet, but it will be updated in the furture.   
+This project is using stereo camera to recontrust the 3D enviroment. There are two alternative method can compute the disparity: SGBM or Libelas. The current project use third party vo library to calculate the pose. The project didn't add parallel threads yet, but it will be updated in the furture.
+
 The Code performs well when using Kitti datasets(00, 01, 02). To run the code, you should put your own dataset and result foloder into the project. The code of loading the data should also be adjust(depending where the dataset you put).
   
 Before install the project, make sure you have install all Third party libraries. They are:  
