@@ -16,7 +16,8 @@ void pointCloudMapping::insertValue(pcl::PointCloud<pcl::PointXYZRGB>::Ptr&inser
     cx = camera[3]*s; 
     cy = camera[5]*s;   
     Cloud    = boost::make_shared<pcl::PointCloud<PointXYZRGB>>( );
-    *Cloud = *insertCloud;
+    GlobalCloud = boost::make_shared<pcl::PointCloud<PointXYZRGB>>( );
+    *GlobalCloud = *insertCloud;
     for(int i =0; i<4; i++){
         for(int j=0; j<4; j++){
             if( j ==3 && i != 3){
@@ -84,14 +85,7 @@ void pointCloudMapping::initialize3Dmap(){
         }
     }
     transformPointCloud (*temp, *temp, T);
-
-    pcl::VoxelGrid<pcl::PointXYZRGB> downSampled;  
-    downSampled.setInputCloud (temp);            
-    downSampled.setLeafSize (100.0f, 100.0f, 100.0f);  
-    downSampled.setDownsampleAllData(true);
-    downSampled.filter (*temp);           
-
-    *Cloud += *temp;
+    *Cloud = *temp;
     cout<<"The original point cloud has: "<<Cloud->points.size()<<" points"<<endl;
 }
 
@@ -101,6 +95,12 @@ void pointCloudMapping::pointFusion(){
 }
 void pointCloudMapping::pointCloudFilter(){
 
+    pcl::VoxelGrid<pcl::PointXYZRGB> downSampled;  
+    downSampled.setInputCloud (Cloud);            
+    downSampled.setLeafSize (100.0f, 100.0f, 100.0f);  
+    downSampled.setDownsampleAllData(true);
+    downSampled.filter (*Cloud);
+              
     pcl::RadiusOutlierRemoval<pcl::PointXYZRGB> pcFilter;  
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered(new pcl::PointCloud<pcl::PointXYZRGB>);    
     pcFilter.setInputCloud(Cloud);             
@@ -115,7 +115,7 @@ void pointCloudMapping::pointCloudFilter(){
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr pointCloudMapping::outputPointCloud()
 {
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr temp(new pcl::PointCloud<pcl::PointXYZRGB>); 
-    *temp = *Cloud;
+    *temp = *GlobalCloud+*Cloud;
     return temp;
 }
 
@@ -149,7 +149,7 @@ void showPointCloud(const vector<Vector4d, Eigen::aligned_allocator<Vector4d>> &
         d_cam.Activate(s_cam);
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-        glPointSize(4);
+        glPointSize(2);
         glBegin(GL_POINTS);
         for (auto &p: pointcloud) {
             glColor3f(p[3], p[3], p[3]);
@@ -180,16 +180,16 @@ void pointCloudMapping::pointVisuallize(){
     // }
     // pcl::io::savePLYFile ("../Result/pointcloud.ply", *Cloud);
     vector<Vector4d, Eigen::aligned_allocator<Vector4d>> pointcloud;
-    for(int i = 0; i<Cloud->points.size(); i++){
-            int r = Cloud->points[i].r;
-            int g = Cloud->points[i].g;
-            int b = Cloud->points[i].b;
+    for(int i = 0; i<GlobalCloud->points.size(); i++){
+            int r = GlobalCloud->points[i].r;
+            int g = GlobalCloud->points[i].g;
+            int b = GlobalCloud->points[i].b;
             Eigen::Vector4d point1(0, 0, 0, r/ 255.0); // 前三维为xyz,第四维为颜色
-            point1[0] = double(Cloud->points[i].x)/1000.0;
+            point1[0] = double(GlobalCloud->points[i].x)/1000.0;
             //cout << "X" << " " << point1[0]  << endl;
-            point1[1] = double(Cloud->points[i].y)/1000.0;
+            point1[1] = double(GlobalCloud->points[i].y)/1000.0;
             //cout << "Y" << " " << point1[1] << endl;
-            point1[2] = double(Cloud->points[i].z)/1000.0;
+            point1[2] = double(GlobalCloud->points[i].z)/1000.0;
             //cout << "Z" << " " << point1[2] << endl;
             pointcloud.push_back(point1);
     }

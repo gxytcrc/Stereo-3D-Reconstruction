@@ -40,6 +40,7 @@ public:
     
 private:
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr Cloud;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr GlobalCloud;
     Matrix4f T = Matrix4f::Identity();
     Mat depth;
     Mat image;

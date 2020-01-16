@@ -9,7 +9,7 @@ int main()
 {
     //initialize-----------------------------------------------------------------------------------------------------------------
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    string dir = "../Dataset/01/";
+    string dir = "../Dataset/00/";
     //generate the camera value and scale
     vector<float> camera(6);
     float scale = 1;
@@ -40,7 +40,7 @@ int main()
     pcl::visualization::CloudViewer viewer("viewer");
     //begain loop------------------------------------------------------------------------------------------------------------
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    for(int i =0; i<200; i++){
+    for(int i =0; i<300; i++){
         char base_name[256];
         sprintf(base_name,"%06d.png",i);
         string left_img_file_name  = dir+"image_0/" + base_name;
@@ -103,7 +103,7 @@ int main()
         if(keyframe == true){
             //obtain the Dsiparity value
             stereoDepth.insertValue(image0, image1, camera, scale);
-            stereoDepth.computeDisparity();
+            stereoDepth.computeDisparityElas();
             stereoDepth.computeDepth();
             //calculate the point cloud
             pointCloudMapping.insertValue(cloud, stereoDepth.depth, image_rgb, frame_pose, camera, scale);
