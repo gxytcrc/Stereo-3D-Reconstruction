@@ -1,17 +1,30 @@
 # Stereo 3D reconstruction
-This project is using stereo camera to recontrust the 3D enviroment. There are two alternative method can compute the disparity: SGBM or Libelas. The current project use third party vo library to calculate the pose. The project didn't add parallel threads yet, but it will be updated in the furture.
-
+This project is using stereo camera to recontrust the 3D enviroment. There are two alternative method can compute the disparity: SGBM or Libelas. 
 The Code performs well when using Kitti datasets(00, 01, 02). To run the code, you should put your own dataset and result foloder into the project. The code of loading the data should also be adjust(depending where the dataset you put).
   
-Before install the project, make sure you have install all Third party libraries. They are:  
-PCL(point cloud library)  
-Opencv  
-Pangolin  
-Ceres  
-  
-After install all libraries, open a terminal in the root dictionary, then, follow the steps to install the project:  
-1.mkdir build  
-2.cd build  
-3.cmake ..  
-4.make  
-After the project is installed, type ./3D_reconstruct to run the project. 
+# 3dReconstruct
+3D reconstruction system capable of capturing comprehensive dense globally consistentmaps explored using a stereo camera.
+
+# 1. What do I need to build it? #
+* Ubuntu
+* CMake
+* Eigen
+* Pangolin
+* OpenCV
+* Ceres Solver
+* PCL
+
+# 2. How do I use it? #
+Clone the repository and catkin_make:
+```
+    git clone https://github.com/zYinji/3dReconstruct,git
+    mkdir build
+    cd build
+    cmake ..
+    catkin_make
+```
+Capture a stereo dataset. Launch it as follows:
+```
+./3dReconstruct folderName frameNumber
+```
+
