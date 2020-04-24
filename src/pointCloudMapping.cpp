@@ -50,10 +50,106 @@ void pointCloudMapping::initialize3Dmap(){
 
             float Dep;
             Dep = depth.at<float>(i,j);
-            if(Dep>30000||Dep<1){
+            if(i>100){
+                if(Dep>3000||Dep<1){
+                    continue;
+                }
+            }
+            else{
+                if(Dep>6000||Dep<1){
+                    continue;
+                }
+            }
+            float X=x0* Dep;
+            float Y=y0 * Dep;
+            float Z=Dep;
+            
+            int number = i*depth.cols+j;
+            point.x = X;
+            point.y = Y;
+            point.z = Z;
+            
+            // cout<<"X: "<<X<<endl;
+            // cout<<"Y: "<<Y<<endl;
+            // cout<<"Z: "<<Z<<endl; 
+
+            int b =  image.at<Vec3b>(i, j)[0];
+            int g=  image.at<Vec3b>(i, j)[1];
+            int r =  image.at<Vec3b>(i, j)[2];
+
+            unsigned char R= r;
+            unsigned char G= g;
+            unsigned char B= b;
+
+            uint8_t rp = r;  
+            uint8_t gp = g; 
+            uint8_t bp = b;
+            uint32_t rgb = ((uint32_t )rp<<16 | (uint32_t )gp<<8 |  (uint32_t )bp);
+            point.rgb = *reinterpret_cast<float*>(&rgb);
+
+            temp->push_back(point);
+        }
+    }
+    transformPointCloud (*temp, *temp, T);
+    *Cloud = *temp;
+    cout<<"The original point cloud has: "<<Cloud->points.size()<<" points"<<endl;
+}
+
+void pointCloudMapping::initialize3DmapSemi(){
+    // cloud->width = depth.cols*depth.rows;
+    // cloud->height = 1;
+    // cloud->points.resize (cloud->width * cloud->height);
+    double init_sigma = 1.6;
+    double k = 1.26;
+    vector<double> sigma_current;
+    sigma_current.resize(5);
+    for (int level = 1; level < 6; level++) {
+        sigma_current[level - 1] = sqrt((pow(k, level) * init_sigma) * (pow(k, level) * init_sigma) - (pow(k, level - 1) * init_sigma) * (pow(k, level - 1) * init_sigma));
+    }
+    Mat img_gaussian1, img_gaussian2;
+    Mat img_DoG;
+    GaussianBlur(image, img_gaussian1, Size(5, 5), sigma_current[0], 0);
+    GaussianBlur(img_gaussian1, img_gaussian2, Size(5, 5), sigma_current[1], 0);
+    img_DoG = img_gaussian1 - image;
+
+    Mat disp8U = Mat(img_DoG.rows, img_DoG.cols, CV_8UC1);
+    normalize(img_DoG, disp8U, 0, 255, NORM_MINMAX, CV_8UC1);
+    imshow("DoG", disp8U);
+    //cout<<img_DoG<<endl;
+    
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr temp(new pcl::PointCloud<pcl::PointXYZRGB>); 
+    for(int i=0;i<depth.rows;i++) {
+        for(int j =0; j<depth.cols; j++){
+
+            pcl::PointXYZRGB point;
+
+            double u0= j;
+            double v0= i;
+            double du0=u0-cx;
+            double dv0=v0-cy;
+            double x0=du0/fx;
+            double y0=dv0/fx;
+
+            float Dep;
+            Dep = depth.at<float>(i,j);
+            if(Dep>2500||Dep<1){
                 continue;
             }
-
+            disp8U.convertTo(disp8U, CV_32F, 1);
+            bool judge = false;
+            for(int row = -3; row<4; row++){
+                for(int col = -3; col<4; col++){
+                    if( i>5&& j>5&& i<depth.rows-5&& j<depth.cols-5){
+                        float difference = disp8U.at<float>(i+row, j+col);
+                        if(difference >50){
+                            judge = true;
+                        }
+                    }
+                }
+            }
+            if (judge == false){
+                continue;
+            }
             float X=x0* Dep;
             float Y=y0 * Dep;
             float Z=Dep;

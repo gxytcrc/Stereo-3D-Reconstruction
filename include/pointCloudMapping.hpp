@@ -33,6 +33,7 @@ public:
     
     void insertValue(pcl::PointCloud<pcl::PointXYZRGB>::Ptr&insertCloud, Mat&depthmap, Mat&image1, Mat&TransformsValue, vector<float>&camera, float scale);
     void initialize3Dmap();
+    void initialize3DmapSemi();
     void pointCloudFilter();
     void pointFusion();
     void pointVisuallize();

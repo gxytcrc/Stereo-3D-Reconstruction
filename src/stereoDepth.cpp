@@ -48,7 +48,7 @@ void stereoDepth::computeDisparity(){
     //normalize the disparity for visuallzation
     Mat disp8U = Mat(disparity.rows, disparity.cols, CV_8UC1);
     normalize(disparity, disp8U, 0, 255, NORM_MINMAX, CV_8UC1);
-    //imshow("disparty", disp8U);
+    imshow("disparty", disp8U);
 }
 
 void stereoDepth::computeDisparityElas(){
@@ -58,7 +58,7 @@ void stereoDepth::computeDisparityElas(){
     Mat leftdpf = Mat::zeros(imsize, CV_32F);
     Mat rightdpf = Mat::zeros(imsize, CV_32F);
 
-    Elas::parameters param(Elas::MIDDLEBURY);
+    Elas::parameters param(Elas::ROBOTICS);
     param.postprocess_only_left = true;
     //param.filter_adaptive_mean = true;
     Elas elas(param);
@@ -66,7 +66,7 @@ void stereoDepth::computeDisparityElas(){
     leftdpf.convertTo(disparity, CV_32F, 1.);
     Mat disp8U = Mat(disparity.rows, disparity.cols, CV_8UC1);
     normalize(disparity, disp8U, 0, 255, NORM_MINMAX, CV_8UC1);
-    //imshow("disparty", disp8U);
+    imshow("disparty", disp8U);
     //cout<<disparity.row(1)<<endl;
 
 }
@@ -168,7 +168,6 @@ void stereoDepth::computeDepth(){
     Mat temp = disparity;
     temp = 1/temp;
     depth = (fx*baseline)*temp;
-    depth = depth - (107.911/2);
     depth.convertTo(depth, CV_32F, 1);
     for(int i = 0; i<depth.rows; i++){
         for(int j =0; j<depth.cols; j++){
