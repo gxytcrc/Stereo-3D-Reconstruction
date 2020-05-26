@@ -17,7 +17,7 @@ The Code performs well when using Kitti datasets(00, 01, 02). To run the code, y
 # 2. How do I use it? #
 Clone the repository and catkin_make:
 ```
-    git clone https://github.com/zYinji/3dReconstruct,git
+    git clone https://github.com/gxytcrc/Stereo-3D-Reconstruction.git
     mkdir build
     cd build
     cmake ..
