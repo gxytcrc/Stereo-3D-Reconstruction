@@ -21,7 +21,7 @@ Clone the repository and catkin_make:
     mkdir build
     cd build
     cmake ..
-    catkin_make
+    make
 ```
 Capture a stereo dataset. Launch it as follows:
 ```
